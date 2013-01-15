@@ -116,6 +116,9 @@ function vCard() {
 			var d = fields[0].split(";");
 			var snippet = {};
 			var type = [];
+            if (!json.hasOwnProperty(d[0])) {
+                json[d[0]] = [];
+            }
 
 			if (version == 3.0) {
 				/* Strip off 'TYPE' argument before doing anything else. */
@@ -138,13 +141,13 @@ function vCard() {
 				if (type.length > 0) {
 					snippet.type = type;
 					snippet.value = fields[1];
-					json[d[0]] = snippet;
+					json[d[0]].push(snippet);
 				} else {
 					/* Be sure to remove any left over control chars, but give a special treat to N */
 					if (d[0] === 'N') {
-						json[d[0]] = fields[1].replace(/;+$/g, '').replace(/;/, ', ').replace(/ $/, '');
+						json[d[0]].push(fields[1].replace(/;+$/g, '').replace(/;/, ', ').replace(/ $/, ''));
 					} else {
-						json[d[0]] = fields[1].replace(/;/g, ' ');
+						json[d[0]].push(fields[1].replace(/;/g, ' '));
 					}
 				}
 			} else if (version === 4) {
@@ -178,13 +181,13 @@ function vCard() {
 					} else {
 						snippet.value = fields[2];
 					}
-					json[d[0]] = snippet;
+					json[d[0]].push(snippet);
 				} else {
 					/* Be sure to remove any left over control chars, but give a special treat to N */
 					if (d[0] === 'N') {
-						json[d[0]] = fields[1].replace(/;+$/g, '').replace(/;/, ', ').replace(/ $/, '');
+						json[d[0]].push(fields[1].replace(/;+$/g, '').replace(/;/, ', ').replace(/ $/, ''));
 					} else {
-						json[d[0]] = fields[1].replace(/;/g, ' ');
+						json[d[0]].push(fields[1].replace(/;/g, ' '));
 					}
 				}
 			} else {
