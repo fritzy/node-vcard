@@ -175,7 +175,7 @@ function vCard() {
 				}
 			} else {
 				/* wut?! */
-				return {err:"Unknown version encountered: %s", version};
+				return {err:"Unknown version encountered: " + version};
 			}
 		}
 
