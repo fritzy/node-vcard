@@ -11,32 +11,21 @@ function vCard() {
 	 * Read file from disk, validate and parse it.
 	 */
 	this.readFile = function (file, cb) {
-		if (fs.existsSync(file)) {
-			/* now read the data and pass it to validatevCard() */
-			var data;
-			try {
-				data = fs.readFileSync(file, 'ascii');
-			} catch (error) {
-				cb(error);
-			}
-
-			this.readData(data, function (err, json) {
-				if (err) {
-					cb(err);
-				} else {
-					cb(null, json);
-				}
-			});
-
-		} else {
-			cb(file + " not found. Does it exist?");
-		}
+        fs.readFile(file, function (err, data) {
+            var res;
+            if(err) {
+                cb(err);
+            } else {
+                res = this.readData(data)
+                cb(res.err, res.json);
+            }
+        });
 	}
 
 	/*
 	 * Read the vCard data (as String), validate and parse it.
 	 */
-	this.readData = function (card, cb) {
+	this.readData = function (card) {
 		/*
 		 * Massage the data from a string to an array,
 		 * which makes parsing it later on a lot easier.
@@ -50,15 +39,9 @@ function vCard() {
 			}
 		}
 		if (this.validatevCard(data)){
-			this.parsevCard(data, function (err, json){
-				if (err) {
-					cb(err);
-				} else {
-					cb(null, json);
-				}
-			});
+			return this.parsevCard(data);
 		} else {
-			cb("Invalid vCard data.");
+			return {err: "Invalid vCard data."};
 		}
 	}
 
@@ -67,7 +50,7 @@ function vCard() {
 	 * If an error occurs cb(err, null) get's called, otherwise cb(null, json)
 	 * with the valid JSON data.
 	 */
-	this.parsevCard = function (data, cb) {
+	this.parsevCard = function (data) {
 		var inserted = 0;
 		var json = {};
 		var version = getVersion(data);
@@ -192,14 +175,14 @@ function vCard() {
 				}
 			} else {
 				/* wut?! */
-				cb("Unknown version encountered: %s", version);
+				return {err:"Unknown version encountered: %s", version};
 			}
 		}
 
 		if (inserted > 0) {
-			cb(null, json);
+            return {json: json};
 		} else {
-			cb("No JSON elements found?!");
+		    return {err: "No JSON elements found?!"};
 		}
 	}
 
